@@ -43,12 +43,14 @@ tileColor = (
     QColor(220, 100, 255),  # UNI_DIR_END
 )
 editState = TileState.EMPTY
+stateMatrix = [[TileState.EMPTY for _ in range(32)] for _ in range(32)]
+
 
 class HexTile(QGraphicsPolygonItem):
-    def __init__(self, center, size, state):
+    def __init__(self, center, size, x,y):
         super().__init__(create_hexagon(center, size))
-        self.setBrush(QBrush(tileColor[state.value]))
-        self.state = state
+        self.setBrush(QBrush(tileColor[stateMatrix[x][y].value]))
+        self.x, self.y = x,y
         self.setPen(QColor(0, 0, 0))     
 
     def mousePressEvent(self, event):
@@ -59,7 +61,7 @@ class HexTile(QGraphicsPolygonItem):
             self.setTileState(TileState.EMPTY)  # 타일 상태를 빈 타일로 변경
 
     def setTileState(self, state):
-        self.state = state
+        stateMatrix[self.x][self.y]= state
         self.setBrush(QBrush(tileColor[state.value]))
     
     def on_action1_triggered(self):
@@ -67,7 +69,8 @@ class HexTile(QGraphicsPolygonItem):
     
     def on_action2_triggered(self):
         print("Action 2 triggered")
-        
+
+
 
 
 class MainWindow(QMainWindow):
@@ -148,7 +151,7 @@ class MainWindow(QMainWindow):
             for col in range(self.cols):
                 x_offset = self.size * 3/2 * col
                 y_offset = self.size * math.sqrt(3) * (row + 0.5 * (col % 2))
-                hex_tile = HexTile(QPointF(x_offset, y_offset), self.size, TileState.EMPTY)
+                hex_tile = HexTile(QPointF(x_offset, y_offset), self.size, row, col)
                 self.scene.addItem(hex_tile)
     
     def edit_state_changed(self, index):

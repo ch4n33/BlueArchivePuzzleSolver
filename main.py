@@ -59,7 +59,9 @@ tileColor = (
     QColor(255, 255, 180)   # START
 )
 editState = TileState.EMPTY
-editEnemy = None
+editDefense = 'light'
+editMove = 'stationary'
+editDifficulty = 0
 stateMatrix = [[Tile(TileState.EMPTY) for _ in range(32)] for _ in range(32)]
 
 
@@ -75,7 +77,7 @@ class HexTile(QGraphicsPolygonItem):
             print (f'editState: {editState.name}')
             self.setTileState(editState)  # 타일 상태를 타일로 변경
         elif event.button() == Qt.RightButton:
-            self.setEnemy(editEnemy)  # 적을 배치
+            self.setEnemy(Enemy(editDefense,editMove,editDifficulty))  # 적을 배치
 
     def setTileState(self, state):
         stateMatrix[self.x][self.y].setTileState(state)
@@ -130,6 +132,10 @@ class MainWindow(QMainWindow):
         control_layout = QHBoxLayout()
         self.row_label = QLabel(f"Rows: {self.rows}")
         self.col_label = QLabel(f"Cols: {self.cols}")
+        self.defense_label = QLabel("Defense:")
+        self.move_label = QLabel("Move:")
+        self.difficulty_label = QLabel("Difficulty:")
+        self.edit_tile_label = QLabel("Tile:")
 
         self.row_slider = QSlider(Qt.Horizontal)
         self.row_slider.setMinimum(1)
@@ -179,11 +185,20 @@ class MainWindow(QMainWindow):
 
         control_layout.addWidget(self.row_label)
         control_layout.addWidget(self.row_slider)
+        
         control_layout.addWidget(self.col_label)
         control_layout.addWidget(self.col_slider)
+        
+        control_layout.addWidget(self.defense_label)
         control_layout.addWidget(self.edit_defense_selector)
+        
+        control_layout.addWidget(self.move_label)
         control_layout.addWidget(self.edit_move_selector)
+        
+        control_layout.addWidget(self.difficulty_label)
         control_layout.addWidget(self.edit_difficulty_selector)
+        
+        control_layout.addWidget(self.edit_tile_label)
         control_layout.addWidget(self.edit_selector)
 
         layout.addLayout(control_layout)
@@ -218,7 +233,15 @@ class MainWindow(QMainWindow):
         print(editState)
         
     def edit_defense_changed(self, index):
-        pass
+        editDefense = self.edit_defense_selector.currentText().lower()
+        if editDefense == 'present':
+            self.edit_move_selector.setCurrentIndex(0)
+            self.edit_difficulty_selector.setCurrentIndex(0)
+            self.edit_move_selector.setEnabled(False)
+            self.edit_difficulty_selector.setEnabled(False)
+        else:
+            self.edit_move_selector.setEnabled(True)
+            self.edit_difficulty_selector.setEnabled(True)
     
     def edit_move_changed(self, index):
         pass
